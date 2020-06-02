@@ -25,6 +25,8 @@ enum Arity
 enum OperationCode
 {
 	INVALID,
+	LEFT_BRACKET,
+	RIGHT_BRACKET,
 	PLUS_B,
 	MINUS_B,
 	MINUS_U,
@@ -41,23 +43,26 @@ struct Operation
 	size_t precedence;
 	Associativity associativity;
 	Arity arity;
+	std::string pattern;
 };
 
 class UnaryOperation : public Operation
 {
 	public:
-		using evaluate = float(*)(float);
-		using check_validity = bool (*)(float);
+		using evaluate = double(*)(double);
+		using check_validity = bool (*)(double);
 
+		UnaryOperation() = default;
 		UnaryOperation(
 			OperationCode id,
 			size_t priority,
 			Associativity associativity,
+			std::string pattern,
 			evaluate eval,
 			check_validity validate = nullptr);
 
-		bool Validate(float operand) const;
-		float Evaluate(float operand) const;
+		bool Validate(double operand) const;
+		double Evaluate(double operand) const;
 
 	private:
 		evaluate eval;
@@ -67,26 +72,34 @@ class UnaryOperation : public Operation
 class BinaryOperation : public Operation
 {
 	public:
-		using evaluate = float(*)(float, float);
-		using check_validity = bool (*)(float, float);
+		using evaluate = double(*)(double, double);
+		using check_validity = bool (*)(double, double);
 
+		BinaryOperation() = default;
 		BinaryOperation(
 			OperationCode id,
 			size_t priority,
 			Associativity associativity,
+			std::string pattern,
 			evaluate eval,
 			check_validity validate = nullptr);
 
-		bool Validate(float lhs, float rhs) const;
-		float Evaluate(float lhs, float rhs) const;
+		bool Validate(double lhs, double rhs) const;
+		double Evaluate(double lhs, double rhs) const;
 
 	private:
 		evaluate eval;
 		check_validity validate;
 };
 
-extern const std::unordered_map<std::string, UnaryOperation> value_to_unary_operation;
-extern const std::unordered_map<std::string, BinaryOperation> value_to_binary_operation;
+struct OperationPair
+{
+	OperationCode unary;
+	OperationCode binary;
+};
+
+extern const std::vector<UnaryOperation> unary_operation;
+extern const std::vector<BinaryOperation> binary_operation;
 
 } // namespace math
 
