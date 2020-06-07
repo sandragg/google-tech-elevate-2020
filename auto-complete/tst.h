@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <stack>
 
 
 /* Ternary search tree */
@@ -15,9 +16,9 @@ class Trie
 
 	public:
 		Trie(size_t size = DEFAULT_SIZE);
-		Trie& Insert();
-		Trie& Remove();
-		std::vector<std::string> MatchPrefix(std::string prefix, size_t limit = 0) const;
+		Trie& Insert(std::string str);
+		Trie& Remove(std::string str);
+//		std::vector<std::string> MatchPrefix(std::string prefix, size_t limit = 0) const;
 
 	private:
 		struct Node
@@ -35,8 +36,14 @@ class Trie
 		position root;
 		size_t space_cursor;
 
+		position allocate_node();
+		void deallocate_node(position p);
 		void init_space_cursor(position begin);
-
+		void init_node(position p);
+		position insert(position root_p, std::string str);
+		position remove(position root_p, std::string str);
+		position remove_path(position root_p, std::stack<position> &stack);
+		bool empty_node(position p) const;
 };
 
 } // namespace tst
