@@ -35,6 +35,10 @@ int main()
 	}
 
 //	Solve(dict, queries);
+//	auto words = dict.MatchPrefix("", 100);
+	auto words = dict.GetAll();
+	for (auto &word : words)
+		std::cout << word << std::endl;
 
 	return 0;
 }

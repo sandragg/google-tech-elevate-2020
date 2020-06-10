@@ -23,6 +23,35 @@ Trie& Trie::Remove(std::string str)
 	return *this;
 }
 
+std::vector<std::string> Trie::GetAll() const
+{
+	std::vector<std::string> result;
+	get_words(root, "", result, nodes.size());
+	return result;
+}
+
+std::vector<std::string> Trie::MatchPrefix(std::string prefix, size_t limit) const
+{
+	std::vector<std::string> result;
+	std::stack<position> stack;
+	position node_p = root;
+	size_t str_index = 0;
+
+	if (prefix.empty())
+	{
+		get_words(root, prefix, result, limit);
+		return result;
+	}
+
+	do {
+		auto subtrie = get_prefix_subtrie(node_p, stack, prefix, str_index);
+		get_words(subtrie, prefix, result, limit);
+		// shift str_index and node_p ???
+	} while (!stack.empty() && result.size() < limit);
+
+	return result;
+}
+
 void Trie::init_space_cursor(position begin)
 {
 	space_cursor = begin;
@@ -76,7 +105,7 @@ Trie::position Trie::insert(position root_p, std::string str)
 		if (node.character == c)
 		{
 			i++;
-			if (node.mid == END) break;
+			if (node.mid == END || i == size) break;
 			p = node.mid;
 			continue;
 		}
@@ -87,7 +116,7 @@ Trie::position Trie::insert(position root_p, std::string str)
 				p = node.left;
 				continue;
 			}
-			p = node.left = allocate_node();
+			p = nodes[p].left = allocate_node();
 		}
 		else
 		{
@@ -96,7 +125,7 @@ Trie::position Trie::insert(position root_p, std::string str)
 				p = node.right;
 				continue;
 			}
-			p = node.right = allocate_node();
+			p = nodes[p].right = allocate_node();
 		}
 		nodes[p].character = c;
 		i++;
@@ -173,5 +202,73 @@ bool Trie::empty_node(position p) const
 	auto &node = nodes[p];
 	return !node.is_end && node.left == END && node.mid == END && node.right == END;
 }
+
+Trie::position Trie::get_prefix_subtrie(
+	position p,
+	std::stack<position> &stack,
+	const std::string& prefix,
+	size_t prefix_index) const
+{
+	return 0;
+}
+
+void Trie::get_words(
+	Trie::position node_p,
+	std::string prefix,
+	std::vector<std::string>& result,
+	size_t limit) const
+{
+	std::stack<position> stack;
+
+	while (result.size() < limit && (!stack.empty() || node_p != END))
+	{
+		if (stack.empty() || node_p != nodes[stack.top()].left)
+		{
+			while (node_p != END)
+			{
+				stack.push(node_p);
+				node_p = nodes[node_p].left;
+			}
+		}
+
+		auto &node = nodes[stack.top()];
+		prefix.push_back(node.character);
+
+		if (node.is_end)
+		{
+			result.emplace_back(prefix);
+		}
+		if (node.mid != END)
+		{
+			node_p = node.mid;
+		}
+		else
+		{
+			auto prefix_new_size = prefix.size();
+			node_p = pop_path(END, prefix_new_size, stack);
+			prefix.resize(prefix_new_size);
+		}
+	}
+}
+
+Trie::position Trie::pop_path(Trie::position p, size_t &prefix_index, std::stack<position>& stack) const
+{
+	while (!stack.empty())
+	{
+		auto &node = nodes[stack.top()];
+		if (p == node.left && p != END) break;
+
+		if (p == node.mid)
+		{
+			if (prefix_index > 0) prefix_index--;
+			if (node.right != END) return node.right;
+		}
+		p = stack.top();
+		stack.pop();
+	}
+
+	return stack.empty() ? END : p;
+}
+
 
 } // namespace tst
