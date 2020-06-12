@@ -48,8 +48,10 @@ class Trie
 		position get_prefix_subtrie(
 			position p,
 			std::stack<position> &stack,
-			const std::string& prefix,
-			size_t prefix_index) const;
+			const std::string& query_prefix,
+			std::string& prefix,
+			size_t &prefix_index,
+			int &typo_index) const;
 		void get_words(
 			position root_p,
 			std::string prefix,

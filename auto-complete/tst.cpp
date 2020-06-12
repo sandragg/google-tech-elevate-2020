@@ -30,23 +30,32 @@ std::vector<std::string> Trie::GetAll() const
 	return result;
 }
 
-std::vector<std::string> Trie::MatchPrefix(std::string prefix, size_t limit) const
+std::vector<std::string> Trie::MatchPrefix(std::string query_prefix, size_t limit) const
 {
 	std::vector<std::string> result;
 	std::stack<position> stack;
 	position node_p = root;
-	size_t str_index = 0;
+	std::string prefix;
+	size_t prefix_index = 0;
+	int typo_index = -1;
 
-	if (prefix.empty())
+	if (query_prefix.empty())
 	{
-		get_words(root, prefix, result, limit);
+		get_words(root, query_prefix, result, limit);
 		return result;
 	}
 
 	do {
-		auto subtrie = get_prefix_subtrie(node_p, stack, prefix, str_index);
-		get_words(subtrie, prefix, result, limit);
-		// shift str_index and node_p ???
+		auto subtrie = get_prefix_subtrie(node_p, stack, query_prefix, prefix, prefix_index, typo_index);
+		if (subtrie == END) break;
+
+		auto &node = nodes[subtrie];
+		if (node.is_end) result.emplace_back(prefix);
+
+		get_words(node.mid, prefix, result, limit);
+		node_p = pop_path(node.mid, prefix_index, stack);
+		prefix.resize(prefix_index);
+		if (typo_index >= prefix_index) typo_index = -1;
 	} while (!stack.empty() && result.size() < limit);
 
 	return result;
@@ -204,12 +213,59 @@ bool Trie::empty_node(position p) const
 }
 
 Trie::position Trie::get_prefix_subtrie(
-	position p,
+	position node_p,
 	std::stack<position> &stack,
-	const std::string& prefix,
-	size_t prefix_index) const
+	const std::string& query_prefix,
+	std::string& prefix,
+	size_t &prefix_index,
+	int &typo_index) const
 {
-	return 0;
+	while (prefix_index < query_prefix.size() && (!stack.empty() || node_p != END))
+	{
+		if (stack.empty() || (node_p != stack.top() && node_p != nodes[stack.top()].left))
+		{
+			while (node_p != END)
+			{
+				stack.push(node_p);
+				node_p = nodes[node_p].left;
+			}
+		}
+
+		auto &node = nodes[stack.top()];
+
+		if (node_p != END && node_p != node.left)
+		{
+			node_p = pop_path(node.mid, prefix_index, stack);
+			if (typo_index >= prefix_index) typo_index = -1;
+			prefix.resize(prefix_index);
+			continue;
+		}
+
+		auto c = query_prefix[prefix_index];
+		node_p = stack.top();
+
+		if (node.character == c || typo_index < 0)
+		{
+			if (node.character != c) typo_index = prefix_index;
+			if (node.mid != END) node_p = node.mid;
+			prefix_index++;
+			prefix.push_back(node.character);
+			continue;
+		}
+		if (node.right == END)
+		{
+			stack.pop();
+			node_p = pop_path(node_p, prefix_index, stack);
+			prefix.resize(prefix_index);
+		}
+		else
+		{
+			node_p = node.right;
+		}
+		if (typo_index >= prefix_index) typo_index = -1;
+	}
+
+	return stack.empty() ? END : stack.top();
 }
 
 void Trie::get_words(
