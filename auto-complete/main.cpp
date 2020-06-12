@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -7,17 +6,9 @@
 
 void Solve(const tst::Trie &dict, const std::vector<std::string> &queries)
 {
-	auto count = 0;
 	for (auto &query : queries)
 	{
-		auto start = std::chrono::high_resolution_clock::now();
-		auto words = dict.MatchPrefix(query, 100);
-		auto finish = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double> elapsed = finish - start;
-		std::cout << "Query index: " << count++ << std::endl;
-		std::cout << "Query length: " << query.size() << std::endl;
-		std::cout << "Query: " << query << std::endl;
-		std::cout << "Elapsed time: " << elapsed.count() * 1000 << " ms" << std::endl;
+		auto words = dict.MatchPrefix(query, 10);
 		if (words.empty())
 		{
 			std::cout << "<no matches>" << std::endl;
@@ -39,13 +30,7 @@ int main()
 	{
 		std::string dict_word;
 		if (!(std::cin >> dict_word)) std::exit(EXIT_FAILURE);
-		auto start = std::chrono::high_resolution_clock::now();
 		dict.Insert(dict_word);
-		auto finish = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double> elapsed = finish - start;
-		std::cout << "Word index: " << i << std::endl;
-		std::cout << "Word length: " << dict_word.size() << std::endl;
-		std::cout << "Elapsed time: " << elapsed.count() * 1000 << " ms" << std::endl;
 	}
 
 	size_t query_size;
