@@ -4,15 +4,15 @@
 namespace graph
 {
 
-bool Route::operator<(const Route& rhs) const
+bool Route::operator>(const Route& rhs) const
 {
-	if (price != rhs.price)
-		return price < rhs.price;
+	if (cost != rhs.cost)
+		return cost > rhs.cost;
 
-	if (airports.size() != rhs.airports.size())
-		return airports.size() < rhs.airports.size();
+	if (nodes.size() != rhs.nodes.size())
+		return nodes.size() > rhs.nodes.size();
 
-	return airports < rhs.airports;
+	return nodes > rhs.nodes;
 }
 
 } // namespace graph

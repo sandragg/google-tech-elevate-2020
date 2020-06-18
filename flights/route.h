@@ -10,10 +10,10 @@ namespace graph
 
 struct Route
 {
-	std::vector<std::string> airports;
-	int price;
+	std::vector<std::string> nodes;
+	int cost;
 
-	bool operator<(const Route& rhs) const;
+	bool operator>(const Route& rhs) const;
 };
 
 } // namespace graph
