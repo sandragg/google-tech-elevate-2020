@@ -2,12 +2,12 @@
 #include <queue>
 #include <algorithm>
 
-
+template <class Tp>
 struct HeapNode
 {
-	using source = const std::vector<int>;
-	source* container;
-	source::const_iterator element;
+	using source = const std::vector<Tp>;
+	source *container;
+	typename source::const_iterator element;
 
 	bool operator>(const HeapNode& rhs) const
 	{
@@ -15,8 +15,8 @@ struct HeapNode
 	}
 };
 
-template <class Container, class Comparator>
-int get_min_and_advance(std::priority_queue<HeapNode, Container, Comparator>& heap)
+template <class Tp, class Container, class Comparator>
+int get_min_and_advance(std::priority_queue<HeapNode<Tp>, Container, Comparator>& heap)
 {
 	auto top = heap.top();
 	const auto top_value = *top.element;
@@ -28,11 +28,12 @@ int get_min_and_advance(std::priority_queue<HeapNode, Container, Comparator>& he
 	return top_value;
 }
 
-void merge(const std::vector<std::vector<int>>& input, std::vector<int>& output)
+template <class Tp>
+void merge(const std::vector<std::vector<Tp>>& input, std::vector<Tp>& output)
 {
 	std::priority_queue<
-		HeapNode,
-		std::vector<HeapNode>,
+		HeapNode<Tp>,
+		std::vector<HeapNode<Tp>>,
 		std::greater<>
 	> heap;
 

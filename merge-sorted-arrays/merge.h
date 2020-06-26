@@ -3,6 +3,7 @@
 
 #include <vector>
 
-void merge(const std::vector<std::vector<int>>& input, std::vector<int>& output);
+template <class Tp>
+void merge(const std::vector<std::vector<Tp>>& input, std::vector<Tp>& output);
 
 #endif //MERGE_H

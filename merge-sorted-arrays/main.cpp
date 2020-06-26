@@ -1,17 +1,19 @@
 #include <iostream>
 #include <vector>
-#include "./merge.h"
+#include "merge.h"
 
-
-int main() {
+template <class Tp>
+void init_input_arrays(std::istream &stream, std::vector<std::vector<Tp>> &arrays)
+{
 	int n;
-	std::cin >> n;
-	std::vector<int> array_lengths(n);
+	stream >> n;
+	std::vector<size_t> array_lengths(n);
 	for (int i = 0; i < n; i++)
 	{
-		std::cin >> array_lengths[i];
+		stream >> array_lengths[i];
 	}
-	std::vector<std::vector<int>> arrays(n);
+
+	arrays.resize(n);
 	for (int i = 0; i < n; i++)
 	{
 		auto& size = array_lengths[i];
@@ -21,10 +23,15 @@ int main() {
 		for (int j = 0; j < size; j++)
 		{
 			int value;
-			std::cin >> value;
+			stream >> value;
 			array.push_back(value);
 		}
 	}
+}
+
+int main() {
+	std::vector<std::vector<int>> arrays;
+	init_input_arrays(std::cin, arrays);
 
 	std::vector<int> merged;
 	merge(arrays, merged);
