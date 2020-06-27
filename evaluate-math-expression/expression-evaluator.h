@@ -20,7 +20,9 @@ class ExpressionEvaluator
 		explicit ExpressionEvaluator(std::string input);
 		double Evaluate();
 
-		static void initialize_operations();
+		static void initialize_operations(
+			const std::vector<math::UnaryOperation> &unary_operations,
+			const std::vector<math::BinaryOperation> &binary_operations);
 
 	private:
 		std::string expression;

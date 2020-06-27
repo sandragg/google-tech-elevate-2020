@@ -4,37 +4,6 @@
 namespace math
 {
 
-extern const std::vector<UnaryOperation> unary_operation({
-	UnaryOperation(OperationCode::MINUS_U, 3, Associativity::Right, "-",
-		[](double v){ return -v; }),
-
-	UnaryOperation(OperationCode::ABS, 3, Associativity::Right, "abs",
-		[](double v){ return std::fabs(v); }),
-
-	UnaryOperation(OperationCode::SQRT, 3, Associativity::Right, "sqrt",
-		[](double v){ return std::sqrt(v); },
-		[](double v){ return v >= 0; })
-});
-
-extern const std::vector<BinaryOperation> binary_operation({
-	BinaryOperation(OperationCode::PLUS_B, 1, Associativity::Left, "+",
-		[](double lhs, double rhs){ return lhs + rhs; }),
-
-	BinaryOperation(OperationCode::MINUS_B, 1, Associativity::Left, "-",
-		[](double lhs, double rhs){ return lhs - rhs; }),
-
-	BinaryOperation(OperationCode::MULTI, 2, Associativity::Left, "*",
-		[](double lhs, double rhs){ return lhs * rhs; }),
-
-	BinaryOperation(OperationCode::DIVISION, 2, Associativity::Left, "/",
-		[](double lhs, double rhs){ return lhs / rhs; },
-		[](double lhs, double rhs){ return rhs != 0; }),
-
-	BinaryOperation(OperationCode::PWR, 4, Associativity::Right, "^",
-		[](double lhs, double rhs){ return std::pow(lhs, rhs); },
-		[](double lhs, double rhs){ return lhs >= 0; })
-});
-
 UnaryOperation::UnaryOperation(
 	OperationCode id,
 	size_t priority,

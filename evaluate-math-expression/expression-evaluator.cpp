@@ -163,19 +163,21 @@ void ExpressionEvaluator::evaluate_while(
 	}
 }
 
-void ExpressionEvaluator::initialize_operations()
+void ExpressionEvaluator::initialize_operations(
+	const std::vector<math::UnaryOperation> &unary_operations,
+	const std::vector<math::BinaryOperation> &binary_operations)
 {
-	for (const auto& operation : unary_operation)
+	for (const auto& operation : unary_operations)
 	{
 		pattern_to_code_pair.insert(
 			{
 				operation.pattern,
-				{ operation.id, OperationCode::INVALID }
+				OperationPair { operation.id, OperationCode::INVALID }
 			});
 		code_to_unary_operation.insert({ operation.id, operation });
 	}
 
-	for (const auto& operation : binary_operation)
+	for (const auto& operation : binary_operations)
 	{
 		const auto &pattern = operation.pattern;
 

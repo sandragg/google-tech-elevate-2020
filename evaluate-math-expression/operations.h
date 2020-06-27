@@ -98,9 +98,6 @@ struct OperationPair
 	OperationCode binary;
 };
 
-extern const std::vector<UnaryOperation> unary_operation;
-extern const std::vector<BinaryOperation> binary_operation;
-
 } // namespace math
 
 
