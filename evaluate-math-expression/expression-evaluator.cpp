@@ -4,6 +4,42 @@
 #include <cstdlib>
 
 
+namespace
+{
+
+bool is_digit(char c)
+{
+	return c >= '0' && c <='9';
+}
+
+double read_number(const std::string &str, size_t pos, size_t& amount)
+{
+	auto *begin = &str[pos];
+	char *end = nullptr;
+	auto number = strtod(begin, &end);
+	amount = end - begin;
+	return number;
+}
+
+std::string read_operation(const std::string &str, size_t pos, size_t& amount)
+{
+	std::string operation;
+	for (auto i = pos; i < str.size(); i++)
+	{
+		auto c = str[i];
+		if (is_digit(c) || c == '.' || c == '(' || c == ')') break;
+
+		operation.push_back(c);
+		if (c < 'A' || c > 'z') break;
+	}
+	amount = operation.size();
+
+	return operation;
+}
+
+} // anonymous
+
+
 namespace math
 {
 
@@ -20,7 +56,7 @@ ExpressionEvaluator::ExpressionEvaluator(std::string input)
 	expression = expr;
 }
 
-double ExpressionEvaluator::Evaluate()
+double ExpressionEvaluator::Evaluate() const
 {
 	std::stack<OperationCode> operators;
 	std::stack<double> output;
@@ -92,37 +128,13 @@ std::pair<std::string, bool> ExpressionEvaluator::parse_and_validate(const std::
 {
 	std::string parsed_expression;
 
+	// TODO Add validation
 	for (const auto c : expr)
 	{
 		if (c != ' ') parsed_expression.push_back(c);
 	}
 
 	return { parsed_expression, true };
-}
-
-double ExpressionEvaluator::read_number(const std::string &str, size_t pos, size_t& amount) const
-{
-	auto *begin = &str[pos];
-	char *end = nullptr;
-	auto number = strtod(begin, &end);
-	amount = end - begin;
-	return number;
-}
-
-std::string ExpressionEvaluator::read_operation(const std::string &str, size_t pos, size_t& amount) const
-{
-	std::string operation;
-	for (auto i = pos; i < str.size(); i++)
-	{
-		auto c = str[i];
-		if (is_digit(c) || c == '.' || c == '(' || c == ')') break;
-
-		operation.push_back(c);
-		if (c < 'A' || c > 'z') break;
-	}
-	amount = operation.size();
-
-	return operation;
 }
 
 template <class Condition>
@@ -197,15 +209,10 @@ void ExpressionEvaluator::initialize_operations(
 	}
 }
 
-double round_to_n_places(double value, uint16_t decimal_places)
+double round_to_n_places(double value, int decimal_places)
 {
 	double factor = std::pow(10, decimal_places);
 	return round(value * factor) / factor;
-}
-
-bool is_digit(char c)
-{
-	return c >= '0' && c <='9';
 }
 
 } // math

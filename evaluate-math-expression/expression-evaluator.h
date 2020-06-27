@@ -11,14 +11,13 @@
 namespace math
 {
 
-double round_to_n_places(double value, uint16_t decimal_places);
-bool is_digit(char c);
+double round_to_n_places(double value, int decimal_places);
 
 class ExpressionEvaluator
 {
 	public:
 		explicit ExpressionEvaluator(std::string input);
-		double Evaluate();
+		double Evaluate() const;
 
 		static void initialize_operations(
 			const std::vector<math::UnaryOperation> &unary_operations,
@@ -28,8 +27,6 @@ class ExpressionEvaluator
 		std::string expression;
 
 		std::pair<std::string, bool> parse_and_validate(const std::string &expr) const;
-		double read_number(const std::string &str, size_t pos, size_t& amount) const;
-		std::string read_operation(const std::string &str, size_t pos, size_t& amount) const;
 
 		template <class Condition>
 		void evaluate_while(
