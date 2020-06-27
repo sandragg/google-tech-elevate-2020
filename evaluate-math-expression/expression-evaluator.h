@@ -37,6 +37,7 @@ class ExpressionEvaluator
 		static std::unordered_map<std::string, OperationPair> pattern_to_code_pair;
 		static std::unordered_map<OperationCode, UnaryOperation> code_to_unary_operation;
 		static std::unordered_map<OperationCode, BinaryOperation> code_to_binary_operation;
+		static const std::string INVALID_ARGUMENT_EXCEPTION;
 };
 
 } // namespace math

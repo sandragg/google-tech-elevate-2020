@@ -46,13 +46,13 @@ namespace math
 std::unordered_map<std::string, OperationPair> ExpressionEvaluator::pattern_to_code_pair;
 std::unordered_map<OperationCode, UnaryOperation> ExpressionEvaluator::code_to_unary_operation;
 std::unordered_map<OperationCode, BinaryOperation> ExpressionEvaluator::code_to_binary_operation;
-
+const std::string ExpressionEvaluator::INVALID_ARGUMENT_EXCEPTION = "Invalid mathematical expression.";
 
 ExpressionEvaluator::ExpressionEvaluator(std::string input)
 {
 	const auto &[ expr, valid ] = parse_and_validate(input);
 
-	if (!valid) throw std::invalid_argument("Invalid mathematical expression.");
+	if (!valid) throw std::invalid_argument(ExpressionEvaluator::INVALID_ARGUMENT_EXCEPTION);
 	expression = expr;
 }
 
@@ -143,35 +143,29 @@ void ExpressionEvaluator::evaluate_while(
 	std::stack<double> &operands,
 	Condition should_evaluate) const
 {
-	try {
-		while (!operators.empty() && should_evaluate(operators.top()))
-		{
-			auto operation_code = operators.top();
-			operators.pop();
-			auto rhs = operands.top();
-			operands.pop();
-
-			if (code_to_unary_operation.count(operation_code))
-			{
-				const auto& operation = code_to_unary_operation.at(operation_code);
-				if (!operation.Validate(rhs))
-					throw std::exception();
-				operands.push(operation.Evaluate(rhs));
-			}
-			else
-			{
-				auto lhs = operands.top();
-				operands.pop();
-				const auto& operation = code_to_binary_operation.at(operation_code);
-				if (!operation.Validate(lhs, rhs))
-					throw std::exception();
-				operands.push(operation.Evaluate(lhs, rhs));
-			}
-		}
-	}
-	catch (std::exception&)
+	while (!operators.empty() && should_evaluate(operators.top()))
 	{
-		throw std::invalid_argument("Invalid mathematical expression.");
+		auto operation_code = operators.top();
+		operators.pop();
+		auto rhs = operands.top();
+		operands.pop();
+
+		if (code_to_unary_operation.count(operation_code))
+		{
+			const auto& operation = code_to_unary_operation.at(operation_code);
+			if (!operation.Validate(rhs))
+				throw std::invalid_argument(ExpressionEvaluator::INVALID_ARGUMENT_EXCEPTION);
+			operands.push(operation.Evaluate(rhs));
+		}
+		else
+		{
+			auto lhs = operands.top();
+			operands.pop();
+			const auto& operation = code_to_binary_operation.at(operation_code);
+			if (!operation.Validate(lhs, rhs))
+				throw std::invalid_argument(ExpressionEvaluator::INVALID_ARGUMENT_EXCEPTION);
+			operands.push(operation.Evaluate(lhs, rhs));
+		}
 	}
 }
 
