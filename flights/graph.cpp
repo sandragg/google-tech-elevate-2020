@@ -42,7 +42,10 @@ std::vector<Route> Graph::FindShortestRoutes(std::string src, std::string dest, 
 {
 	if (!nodes.count(src) || !nodes.count(dest) || !limit) return {};
 
-	minimal_route_queue routes;
+	std::priority_queue<
+		Route,
+		std::vector<Route>,
+		std::greater<>> routes;
 	find_routes(src, dest, routes, limit);
 
 	std::vector<graph::Route> result(std::min(limit, routes.size()));
@@ -55,10 +58,17 @@ std::vector<Route> Graph::FindShortestRoutes(std::string src, std::string dest, 
 	return result;
 }
 
-void Graph::find_routes(const std::string &src, const std::string &dest, minimal_route_queue &routes, size_t limit) const
+template <class Container, class Comparator>
+void Graph::find_routes(
+	const std::string &src,
+	const std::string &dest,
+	std::priority_queue<Route, Container, Comparator> &routes,
+	size_t limit) const
 {
-	minimal_route_with_meta_queue queue;
-
+	std::priority_queue<
+		RouteWithMeta,
+		std::vector<RouteWithMeta>,
+		Comparator> queue;
 	Route route = { { src }, 0 };
 	std::unordered_set<std::string> visited_nodes;
 	queue.push(RouteWithMeta{ route, visited_nodes });
@@ -79,16 +89,17 @@ void Graph::find_routes(const std::string &src, const std::string &dest, minimal
 	}
 }
 
+template <class Container, class Comparator>
 void Graph::process_node(
 	const RouteWithMeta &route_with_meta,
-	minimal_route_with_meta_queue &queue) const
+	std::priority_queue<RouteWithMeta, Container, Comparator> &queue) const
 {
 	auto node_code = route_with_meta.route.nodes.back();
 	auto node = nodes.at(node_code);
-
-	if (route_with_meta.visited_nodes.count(node_code)) return;
-
 	auto visited_nodes = route_with_meta.visited_nodes;
+
+	if (visited_nodes.count(node_code)) return;
+
 	visited_nodes.insert(node_code);
 	for (const auto &[ code, edge ] : node.connections)
 	{

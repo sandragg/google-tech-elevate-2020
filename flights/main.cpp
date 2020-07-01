@@ -11,18 +11,24 @@ struct Flight
 	int price;
 };
 
-int main()
+void init_flights(std::istream &stream, std::vector<Flight> &flights)
 {
 	int number_of_flights;
 	std::cin >> number_of_flights;
 
-	std::vector<Flight> flights(number_of_flights);
+	flights.resize(number_of_flights);
 	for (auto &flight : flights)
 	{
-		std::cin >> flight.departs;
-		std::cin >> flight.arrives;
-		std::cin >> flight.price;
+		stream >> flight.departs;
+		stream >> flight.arrives;
+		stream >> flight.price;
 	}
+}
+
+int main()
+{
+	std::vector<Flight> flights;
+	init_flights(std::cin, flights);
 
 	int limit;
 	std::cin >> limit;
